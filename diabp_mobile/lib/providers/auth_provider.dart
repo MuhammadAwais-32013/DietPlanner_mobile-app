@@ -38,7 +38,7 @@ class AuthProvider extends ChangeNotifier {
       final result = await _authService.login(email, password);
       if (result['success'] == true) {
         final prefs = await SharedPreferences.getInstance();
-        _userId = result['user_id']?.toString();
+        _userId = result['id']?.toString();  // backend returns 'id', not 'user_id'
         _userName = result['name'] ?? email.split('@').first;
         _userEmail = email;
         _isLoggedIn = true;

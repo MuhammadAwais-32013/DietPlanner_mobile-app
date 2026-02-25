@@ -36,17 +36,45 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
     }
   }
 
+  /// backend to_dict() returns: { bloodPressure: "120/80", bloodSugar: 100.0, date: "2024-01-01", notes }
   double? _avgBp(String type) {
-    final vals = _records.where((r) => r[type] != null).map((r) => (r[type] as num).toDouble()).toList();
-    if (vals.isEmpty) return null;
-    return vals.reduce((a, b) => a + b) / vals.length;
+    if (type == 'systolic') {
+      final vals = _records
+          .where((r) => r['bloodPressure'] != null)
+          .map((r) {
+            final parts = (r['bloodPressure'] as String).split('/');
+            return parts.isNotEmpty ? double.tryParse(parts[0]) : null;
+          })
+          .whereType<double>()
+          .toList();
+      if (vals.isEmpty) return null;
+      return vals.reduce((a, b) => a + b) / vals.length;
+    } else if (type == 'diastolic') {
+      final vals = _records
+          .where((r) => r['bloodPressure'] != null)
+          .map((r) {
+            final parts = (r['bloodPressure'] as String).split('/');
+            return parts.length > 1 ? double.tryParse(parts[1]) : null;
+          })
+          .whereType<double>()
+          .toList();
+      if (vals.isEmpty) return null;
+      return vals.reduce((a, b) => a + b) / vals.length;
+    } else {
+      final vals = _records
+          .where((r) => r['bloodSugar'] != null)
+          .map((r) => (r['bloodSugar'] as num).toDouble())
+          .toList();
+      if (vals.isEmpty) return null;
+      return vals.reduce((a, b) => a + b) / vals.length;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final avgSystolic = _avgBp('systolic');
     final avgDiastolic = _avgBp('diastolic');
-    final avgSugar = _avgBp('blood_sugar');
+    final avgSugar = _avgBp('sugar');
 
     return Scaffold(
       backgroundColor: AppTheme.lightGray,
@@ -199,11 +227,11 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
   }
 
   Widget _recordItem(Map<String, dynamic> r) {
+    // Backend returns: date, bloodPressure ("120/80"), bloodSugar (float), notes
     DateTime? date;
-    try { date = DateTime.parse(r['created_at'] ?? ''); } catch (_) {}
-    final systolic = r['systolic'];
-    final diastolic = r['diastolic'];
-    final sugar = r['blood_sugar'];
+    try { date = DateTime.parse(r['date'] ?? r['created_at'] ?? ''); } catch (_) {}
+    final bp = r['bloodPressure'] as String?;
+    final sugar = r['bloodSugar'];
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -226,8 +254,8 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
               style: AppTheme.labelStyle),
           const SizedBox(height: 4),
           Wrap(spacing: 8, children: [
-            if (systolic != null && diastolic != null)
-              _badge('💧 $systolic/$diastolic mmHg', const Color(0xFFEFF3FF), AppTheme.primaryBlue),
+            if (bp != null && bp.isNotEmpty)
+              _badge('💧 $bp mmHg', const Color(0xFFEFF3FF), AppTheme.primaryBlue),
             if (sugar != null)
               _badge('🩸 $sugar mg/dL', const Color(0xFFFFF3F3), AppTheme.errorRed),
           ]),

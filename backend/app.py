@@ -21,18 +21,12 @@ load_dotenv()
 
 app = FastAPI()
 
-# CORS
+# CORS — allow all origins for development (Flutter web uses random port)
+# ⚠️ For production: restrict to your specific domain
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",   # Next.js dev server
-        "http://127.0.0.1:3000",
-        "http://localhost:5000",   # Flutter web (chrome) default port
-        "http://127.0.0.1:5000",
-        "http://localhost:8080",   # Flutter web alt port
-        "http://127.0.0.1:8080",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,  # Must be False when allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )
