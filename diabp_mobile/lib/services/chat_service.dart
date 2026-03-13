@@ -36,18 +36,33 @@ class ChatService {
     return Map<String, dynamic>.from(response.data);
   }
 
+  /// [duration] must be one of: '7_days', '10_days', '14_days', '21_days', '30_days'
   Future<Map<String, dynamic>> generateDietPlan({
     required String sessionId,
-    required int days,
-    String? preferences,
+    required String duration,
   }) async {
     final response = await _dio.post(
       '/chat/$sessionId/generate-diet-plan',
-      data: {
-        'days': days,
-        if (preferences != null) 'preferences': preferences,
-      },
+      data: {'duration': duration},
     );
     return Map<String, dynamic>.from(response.data);
+  }
+
+  Future<Map<String, dynamic>?> fetchMedicalData(String sessionId) async {
+    try {
+      final response = await _dio.get('/chat/$sessionId/medical-data');
+      return Map<String, dynamic>.from(response.data);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getIngestStatus(String sessionId) async {
+    try {
+      final response = await _dio.get('/chat/session/$sessionId/ingest-status');
+      return Map<String, dynamic>.from(response.data);
+    } catch (e) {
+      return null;
+    }
   }
 }
