@@ -23,9 +23,9 @@ class _HomeScreenState extends State<HomeScreen> {
           CustomScrollView(
             slivers: [
               _buildNavBar(auth),
-              SliverToBoxAdapter(child: _buildHeroSection()),
-              SliverToBoxAdapter(child: _buildFeaturesSection()),
-              SliverToBoxAdapter(child: _buildFaqSection()),
+              SliverToBoxAdapter(child: _buildHeroSection(auth)),
+              SliverToBoxAdapter(child: _buildFeaturesSection(auth)),
+              SliverToBoxAdapter(child: _buildFaqSection(auth)),
               SliverToBoxAdapter(child: _buildFooter()),
             ],
           ),
@@ -42,8 +42,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   context.push('/login');
                 }
               },
-              label: const Text('AI Diet Ass...', style: TextStyle(color: Colors.white, fontSize: 12)),
-              icon: const Icon(Icons.chat_bubble, color: Colors.white, size: 18),
+              label: const Text('AI Diet Assistant',
+                  style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+              icon: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Icon(Icons.health_and_safety_rounded, color: Colors.white, size: 22),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      width: 8, height: 8,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF34D399),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -135,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildHeroSection() {
+  Widget _buildHeroSection(AuthProvider auth) {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(gradient: AppTheme.heroGradient),
@@ -145,17 +162,17 @@ class _HomeScreenState extends State<HomeScreen> {
           final isWide = constraints.maxWidth > 700;
           return isWide
               ? Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                  Expanded(flex: 5, child: _heroText()),
+                  Expanded(flex: 5, child: _heroText(auth)),
                   const SizedBox(width: 40),
                   Expanded(flex: 4, child: _heroCard()),
                 ])
-              : Column(children: [_heroText(), const SizedBox(height: 32), _heroCard()]);
+              : Column(children: [_heroText(auth), const SizedBox(height: 32), _heroCard()]);
         }),
       ),
     );
   }
 
-  Widget _heroText() {
+  Widget _heroText(AuthProvider auth) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -189,17 +206,31 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(color: Color(0xFFD1D5E8), fontSize: 16, height: 1.6),
         ),
         const SizedBox(height: 32),
-        Row(children: [
-          TextButton(
-            onPressed: () => context.push('/signup'),
-            child: const Text('Get Started Free →', style: TextStyle(color: Color(0xFFBFD3FF))),
-          ),
-          const SizedBox(width: 16),
-          TextButton(
-            onPressed: () => context.push('/login'),
-            child: const Text('Sign In', style: TextStyle(color: Color(0xFFBFD3FF))),
-          ),
-        ]),
+        // Show auth-specific CTAs
+        if (!auth.isLoggedIn)
+          Row(children: [
+            TextButton(
+              onPressed: () => context.push('/signup'),
+              child: const Text('Get Started Free →', style: TextStyle(color: Color(0xFFBFD3FF))),
+            ),
+            const SizedBox(width: 16),
+            TextButton(
+              onPressed: () => context.push('/login'),
+              child: const Text('Sign In', style: TextStyle(color: Color(0xFFBFD3FF))),
+            ),
+          ])
+        else
+          Row(children: [
+            TextButton(
+              onPressed: () => context.push('/chat'),
+              child: const Text('Chat with AI →', style: TextStyle(color: Color(0xFFBFD3FF))),
+            ),
+            const SizedBox(width: 16),
+            TextButton(
+              onPressed: () => context.push('/diet-plan'),
+              child: const Text('My Diet Plan', style: TextStyle(color: Color(0xFFBFD3FF))),
+            ),
+          ]),
         const SizedBox(height: 40),
         Row(children: [
           _heroStat('1–30', 'DAY DIET PLANS'),
@@ -307,7 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle));
   }
 
-  Widget _buildFeaturesSection() {
+  Widget _buildFeaturesSection(AuthProvider auth) {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 60),
@@ -340,11 +371,19 @@ class _HomeScreenState extends State<HomeScreen> {
               : Column(children: _featureCards().map((c) => Padding(padding: const EdgeInsets.only(bottom: 16), child: c)).toList());
         }),
         const SizedBox(height: 40),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          TextButton(onPressed: () => context.push('/signup'), child: const Text('Start Your Free Journey →')),
-          const SizedBox(width: 16),
-          TextButton(onPressed: () => context.push('/login'), child: const Text('Already a member? Sign in')),
-        ]),
+        // Only show sign-up/login CTA when NOT logged in
+        if (!auth.isLoggedIn)
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            TextButton(onPressed: () => context.push('/signup'), child: const Text('Start Your Free Journey →')),
+            const SizedBox(width: 16),
+            TextButton(onPressed: () => context.push('/login'), child: const Text('Already a member? Sign in')),
+          ])
+        else
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            TextButton(onPressed: () => context.push('/chat'), child: const Text('Open AI Diet Assistant →')),
+            const SizedBox(width: 16),
+            TextButton(onPressed: () => context.push('/bmi'), child: const Text('Check my BMI')),
+          ]),
       ]),
     );
   }
@@ -405,7 +444,7 @@ class _HomeScreenState extends State<HomeScreen> {
     )).toList();
   }
 
-  Widget _buildFaqSection() {
+  Widget _buildFaqSection(AuthProvider auth) {
     final faqs = [
       {'q': 'How does the AI create my diet plan?', 'a': 'Our AI analyzes your BMI, health metrics, dietary preferences, and goals to generate a personalized nutrition plan optimized for your specific needs.'},
       {'q': 'Can I customize my diet plan?', 'a': 'Yes! You can specify dietary preferences, food allergies, and specific foods you want to include or exclude. The AI adapts your plan while maintaining nutritional balance.'},
@@ -442,10 +481,16 @@ class _HomeScreenState extends State<HomeScreen> {
           )).toList());
         }),
         const SizedBox(height: 32),
-        TextButton(
-          onPressed: () => context.push('/signup'),
-          child: const Text('Get Started Free Today →', style: TextStyle(fontSize: 15)),
-        ),
+        if (!auth.isLoggedIn)
+          TextButton(
+            onPressed: () => context.push('/signup'),
+            child: const Text('Get Started Free Today →', style: TextStyle(fontSize: 15)),
+          )
+        else
+          TextButton(
+            onPressed: () => context.push('/chat'),
+            child: const Text('Ask the AI Assistant →', style: TextStyle(fontSize: 15)),
+          ),
       ]),
     );
   }

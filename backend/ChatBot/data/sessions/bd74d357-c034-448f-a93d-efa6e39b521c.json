@@ -1,0 +1,14 @@
+{
+  "session_id": "bd74d357-c034-448f-a93d-efa6e39b521c",
+  "user_data": {
+    "height": 170,
+    "weight": 70,
+    "diabetes": "No",
+    "blood_pressure": "No"
+  },
+  "files": [
+    "Benevolent Form.pdf"
+  ],
+  "faiss_dir": "/media/muhammad-awais-qarni/Code_Read/DietPlanner_mobile/backend/api/../ChatBot/data/uploads/bd74d357-c034-448f-a93d-efa6e39b521c/faiss",
+  "created_at": "2026-03-13T06:58:30.299578"
+}
