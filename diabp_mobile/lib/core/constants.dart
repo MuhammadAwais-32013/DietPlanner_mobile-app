@@ -2,6 +2,8 @@ class AppConstants {
   // ⚠️ Change this to your machine's IP when testing on device
   // For web (chrome): use localhost
   static const String baseUrl = 'http://127.0.0.1:8000';
+  // static const String baseUrl = 'http://192.168.100.57:8000';
+
   static const String apiUrl = '$baseUrl/api';
 
   // API Endpoints
