@@ -66,10 +66,17 @@ async def periodic_cleanup():
 # Clean up expired sessions on startup and start periodic cleanup
 @app.on_event("startup")
 async def startup_event():
-    """Clean up expired sessions when server starts and start periodic cleanup"""
+    """Clean up expired sessions when server starts, init DB tables, and start periodic cleanup"""
     try:
         cleanup_expired_sessions()
         print("Cleaned up expired sessions on startup")
+        
+        # Initialize SQLite database tables if they don't exist
+        from sqlalchemy import create_engine
+        from models import Base
+        engine = create_engine(f'sqlite:///{db_path}')
+        Base.metadata.create_all(bind=engine)
+        print("Database tables verified/created successfully.")
         
         # Start periodic cleanup task
         asyncio.create_task(periodic_cleanup())
