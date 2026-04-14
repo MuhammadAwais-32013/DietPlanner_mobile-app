@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart';
-import 'dart:html' as html;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import '../../core/theme.dart';
 import '../../services/chat_service.dart';
 
@@ -780,14 +780,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       ),
     );
 
-    // Trigger a direct file download in Chrome web via dart:html
+    // Trigger cross-platform PDF sharing/saving
     final bytes = await doc.save();
-    final blob = html.Blob([bytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
-      ..setAttribute('download', filename)
-      ..click();
-    html.Url.revokeObjectUrl(url);
+    await Printing.sharePdf(bytes: bytes, filename: filename);
   }
 
 
