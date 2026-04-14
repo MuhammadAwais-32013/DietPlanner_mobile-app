@@ -21,6 +21,10 @@ load_dotenv()
 
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"status": "ok", "message": "DiaBP Diet Planner API is running"}
+
 # CORS — allow all origins for development (Flutter web uses random port)
 # ⚠️ For production: restrict to your specific domain
 app.add_middleware(
