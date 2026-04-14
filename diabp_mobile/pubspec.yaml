@@ -25,7 +25,7 @@ dependencies:
   shared_preferences: ^2.2.2
 
   # File upload (medical docs)
-  file_picker: ^6.1.1
+  file_picker: ^8.1.4
 
   # PDF generation (replaces jsPDF)
   pdf: ^3.10.8
