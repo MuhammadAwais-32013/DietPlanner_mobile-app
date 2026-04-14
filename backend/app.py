@@ -35,17 +35,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Handle Azure Read-Only Filesystem
+if os.environ.get('WEBSITE_SITE_NAME'): # We are on Azure App Service
+    base_dir = '/home/site'
+else:
+    base_dir = os.path.dirname(__file__)
+
 # Ensure instance folder exists
-if not os.path.exists(os.path.join(os.path.dirname(__file__), 'instance')):
-    os.makedirs(os.path.join(os.path.dirname(__file__), 'instance'))
+instance_dir = os.path.join(base_dir, 'instance')
+if not os.path.exists(instance_dir):
+    os.makedirs(instance_dir, exist_ok=True)
 
 # Create exports directory if it doesn't exist
-export_dir = os.path.join(os.path.dirname(__file__), 'exports')
+export_dir = os.path.join(base_dir, 'exports')
 if not os.path.exists(export_dir):
-    os.makedirs(export_dir)
+    os.makedirs(export_dir, exist_ok=True)
 
 # Database configuration - use explicit path
-db_path = os.path.join(os.path.dirname(__file__), 'instance', 'diet_consultant.db')
+db_path = os.path.join(instance_dir, 'diet_consultant.db')
 print(f"Using database at: {db_path}")
 app.add_middleware(DBSessionMiddleware, db_url=f'sqlite:///{db_path}')
 
