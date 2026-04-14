@@ -2,6 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('App smoke test', (WidgetTester tester) async {
-    // Add integration tests here
+    // Add integration tests heres
   });
 }
