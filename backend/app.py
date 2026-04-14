@@ -35,11 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Handle Azure Read-Only Filesystem
-if os.environ.get('WEBSITE_SITE_NAME'): # We are on Azure App Service
-    base_dir = '/home/site'
-else:
-    base_dir = os.path.dirname(__file__)
+base_dir = os.path.dirname(__file__)
 
 # Ensure instance folder exists
 instance_dir = os.path.join(base_dir, 'instance')
