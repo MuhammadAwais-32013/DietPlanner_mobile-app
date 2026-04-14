@@ -18,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.lightGray,
+      drawer: _buildDrawer(auth),
       body: Stack(
         children: [
           CustomScrollView(
@@ -68,85 +69,184 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildDrawer(AuthProvider auth) {
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36, height: 36,
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.heroGradient,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.add, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('DiaBP', style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w800,
+                        color: AppTheme.primaryBlue,
+                      )),
+                      const Text('DIET CONSULTANT', style: TextStyle(
+                        fontSize: 9, fontWeight: FontWeight.w600,
+                        color: AppTheme.textGray, letterSpacing: 1.2,
+                      )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            if (auth.isLoggedIn) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: AppTheme.primaryBlue,
+                      radius: 18,
+                      child: Text(
+                        auth.userName?.substring(0, 1).toUpperCase() ?? 'U',
+                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(auth.userName ?? '', style: AppTheme.labelStyle),
+                        Text(auth.userEmail ?? '', style: AppTheme.bodySmall),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(),
+              _drawerItem(Icons.calculate, 'BMI Calculator', () { Navigator.pop(context); context.push('/bmi'); }),
+              _drawerItem(Icons.restaurant_menu, 'Diet Plan', () { Navigator.pop(context); context.push('/diet-plan'); }),
+              _drawerItem(Icons.monitor_heart, 'Health Records', () { Navigator.pop(context); context.push('/records'); }),
+              _drawerItem(Icons.chat_bubble_outline, 'AI Chatbot', () { Navigator.pop(context); context.push('/chat'); }),
+              _drawerItem(Icons.admin_panel_settings, 'Admin', () { Navigator.pop(context); context.push('/admin'); }),
+              _drawerItem(Icons.star_outline, 'Feedback', () { Navigator.pop(context); context.push('/feedback'); }),
+              const Spacer(),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title: const Text('Sign Out', style: TextStyle(color: Colors.red)),
+                onTap: () { Navigator.pop(context); auth.logout(); },
+              ),
+            ] else ...[
+              _drawerItem(Icons.login, 'Login', () { Navigator.pop(context); context.push('/login'); }),
+              _drawerItem(Icons.person_add, 'Get Started', () { Navigator.pop(context); context.push('/signup'); }),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  ListTile _drawerItem(IconData icon, String label, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: AppTheme.primaryBlue, size: 22),
+      title: Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+      onTap: onTap,
+    );
+  }
+
   Widget _buildNavBar(AuthProvider auth) {
     return SliverAppBar(
       pinned: true,
       backgroundColor: Colors.white,
       elevation: 1,
-      toolbarHeight: 70,
+      toolbarHeight: 60,
+      automaticallyImplyLeading: false,
       title: Row(
         children: [
-          Container(
-            width: 36, height: 36,
-            decoration: BoxDecoration(
-              gradient: AppTheme.heroGradient,
-              borderRadius: BorderRadius.circular(10),
+          // Hamburger menu button
+          Builder(
+            builder: (ctx) => IconButton(
+              icon: const Icon(Icons.menu, color: AppTheme.textDark),
+              onPressed: () => Scaffold.of(ctx).openDrawer(),
+              tooltip: 'Menu',
             ),
-            child: const Icon(Icons.add, color: Colors.white, size: 20),
           ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('DiaBP', style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.w800,
-                color: AppTheme.primaryBlue,
-                letterSpacing: -0.5,
-              )),
-              const Text('DIET CONSULTANT', style: TextStyle(
-                fontSize: 9, fontWeight: FontWeight.w600,
-                color: AppTheme.textGray, letterSpacing: 1.2,
-              )),
-            ],
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: () => context.go('/'),
+            child: Row(
+              children: [
+                Container(
+                  width: 32, height: 32,
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.heroGradient,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.add, color: Colors.white, size: 18),
+                ),
+                const SizedBox(width: 8),
+                Text('DiaBP', style: TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.w800,
+                  color: AppTheme.primaryBlue,
+                  letterSpacing: -0.5,
+                )),
+              ],
+            ),
           ),
         ],
       ),
       actions: [
         if (auth.isLoggedIn) ...[
-          TextButton(onPressed: () => context.push('/bmi'), child: const Text('BMI')),
-          TextButton(onPressed: () => context.push('/diet-plan'), child: const Text('Diet Plan')),
-          TextButton(onPressed: () => context.push('/records'), child: const Text('Health Records')),
-          TextButton(onPressed: () => context.push('/admin'), child: const Text('Admin')),
-          TextButton(onPressed: () => context.push('/feedback'), child: const Text('Feedback')),
-          PopupMenuButton<String>(
-            child: CircleAvatar(
-              backgroundColor: AppTheme.primaryBlue,
-              radius: 16,
-              child: Text(
-                auth.userName?.substring(0, 1).toUpperCase() ?? 'U',
-                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+          // User avatar
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: PopupMenuButton<String>(
+              child: CircleAvatar(
+                backgroundColor: AppTheme.primaryBlue,
+                radius: 16,
+                child: Text(
+                  auth.userName?.substring(0, 1).toUpperCase() ?? 'U',
+                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+                ),
               ),
+              onSelected: (v) { if (v == 'logout') auth.logout(); },
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  enabled: false,
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('Signed in as', style: AppTheme.bodySmall),
+                    Text(auth.userName ?? '', style: AppTheme.labelStyle),
+                  ]),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem(value: 'logout', child: Row(children: [
+                  Icon(Icons.logout, size: 16, color: Colors.red),
+                  SizedBox(width: 8),
+                  Text('Sign out', style: TextStyle(color: Colors.red)),
+                ])),
+              ],
             ),
-            onSelected: (v) { if (v == 'logout') auth.logout(); },
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                enabled: false,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Signed in as', style: AppTheme.bodySmall),
-                  Text(auth.userName ?? '', style: AppTheme.labelStyle),
-                ]),
-              ),
-              const PopupMenuDivider(),
-              const PopupMenuItem(value: 'logout', child: Row(children: [
-                Icon(Icons.logout, size: 16, color: Colors.red),
-                SizedBox(width: 8),
-                Text('Sign out', style: TextStyle(color: Colors.red)),
-              ])),
-            ],
           ),
-          const SizedBox(width: 16),
         ] else ...[
           TextButton(
             onPressed: () => context.push('/login'),
-            child: const Text('Log in', style: TextStyle(color: AppTheme.textDark)),
+            child: const Text('Log in', style: TextStyle(color: AppTheme.textDark, fontSize: 13)),
           ),
-          const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: () => context.push('/signup'),
-            child: const Text('Get Started →'),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ElevatedButton(
+              onPressed: () => context.push('/signup'),
+              style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+              child: const Text('Sign Up', style: TextStyle(fontSize: 13)),
+            ),
           ),
-          const SizedBox(width: 16),
         ],
       ],
     );
