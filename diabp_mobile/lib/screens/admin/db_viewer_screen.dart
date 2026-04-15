@@ -21,6 +21,7 @@ class _DbViewerScreenState extends State<DbViewerScreen> {
     'bmi': {'label': 'BMI Records', 'icon': Icons.monitor_weight, 'color': const Color(0xFF10B981)},
     'diet_plans': {'label': 'Diet Plans', 'icon': Icons.restaurant_menu, 'color': const Color(0xFFF59E0B)},
     'records': {'label': 'Medical Records', 'icon': Icons.medical_information, 'color': const Color(0xFFEF4444)},
+    'feedback': {'label': 'Feedback', 'icon': Icons.chat_bubble_outline, 'color': const Color(0xFF8B5CF6)},
   };
 
   @override
@@ -82,29 +83,32 @@ class _DbViewerScreenState extends State<DbViewerScreen> {
           child: Row(children: _tableConfigs.entries.map((e) {
             final count = (_data?[e.key] as List?)?.length ?? 0;
             final isActive = _activeTable == e.key;
-            return GestureDetector(
-              onTap: () => setState(() => _activeTable = e.key),
-              child: Container(
-                margin: const EdgeInsets.only(right: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isActive ? Colors.white : Colors.white.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(children: [
-                  Icon(e.value['icon'] as IconData,
-                      color: isActive ? e.value['color'] as Color : Colors.white70, size: 18),
-                  const SizedBox(width: 8),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('$count', style: TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w800,
-                      color: isActive ? e.value['color'] as Color : Colors.white,
-                    )),
-                    Text(e.value['label'] as String, style: TextStyle(
-                      fontSize: 11, color: isActive ? AppTheme.textGray : Colors.white70,
-                    )),
+            return MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => setState(() => _activeTable = e.key),
+                child: Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isActive ? Colors.white : Colors.white.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(children: [
+                    Icon(e.value['icon'] as IconData,
+                        color: isActive ? e.value['color'] as Color : Colors.white70, size: 18),
+                    const SizedBox(width: 8),
+                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('$count', style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w800,
+                        color: isActive ? e.value['color'] as Color : Colors.white,
+                      )),
+                      Text(e.value['label'] as String, style: TextStyle(
+                        fontSize: 11, color: isActive ? AppTheme.textGray : Colors.white70,
+                      )),
+                    ]),
                   ]),
-                ]),
+                ),
               ),
             );
           }).toList()),
@@ -159,10 +163,13 @@ class _DbViewerScreenState extends State<DbViewerScreen> {
             columns: headers.map((h) => DataColumn(label: Text(h.toString().toUpperCase()))).toList(),
             rows: tableData.map((row) {
               final r = row as Map;
-              return DataRow(cells: headers.map((h) {
-                final v = r[h];
-                return DataCell(_cellWidget(h, v));
-              }).toList());
+              return DataRow(
+                mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
+                cells: headers.map((h) {
+                  final v = r[h];
+                  return DataCell(_cellWidget(h, v));
+                }).toList(),
+              );
             }).toList(),
           ),
         ),

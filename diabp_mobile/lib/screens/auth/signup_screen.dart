@@ -17,6 +17,15 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscurePass = true;
+  String _password = '';
+
+  // Password rules
+  bool get _hasMinLen     => _password.length > 6;
+  bool get _hasUppercase  => _password.contains(RegExp(r'[A-Z]'));
+  bool get _hasLowercase  => _password.contains(RegExp(r'[a-z]'));
+  bool get _hasDigit      => _password.contains(RegExp(r'[0-9]'));
+  bool get _hasSpecial    => _password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>_\-+=\[\]\\/~`]'));
+  bool get _isPasswordValid => _hasMinLen && _hasUppercase && _hasLowercase && _hasDigit && _hasSpecial;
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +157,7 @@ class _SignupScreenState extends State<SignupScreen> {
           TextFormField(
             controller: _passCtrl,
             obscureText: _obscurePass,
+            onChanged: (v) => setState(() => _password = v),
             decoration: InputDecoration(
               hintText: 'Create a strong password',
               prefixIcon: const Icon(Icons.lock_outline, size: 20),
@@ -156,8 +166,20 @@ class _SignupScreenState extends State<SignupScreen> {
                 onPressed: () => setState(() => _obscurePass = !_obscurePass),
               ),
             ),
-            validator: (v) => (v?.length ?? 0) < 6 ? 'Min 6 characters' : null,
+            validator: (v) {
+              if (v == null || v.isEmpty) return 'Password is required';
+              if (!_hasMinLen)    return 'Must be more than 6 characters';
+              if (!_hasUppercase) return 'Must contain at least 1 uppercase letter';
+              if (!_hasLowercase) return 'Must contain at least 1 lowercase letter';
+              if (!_hasDigit)     return 'Must contain at least 1 number';
+              if (!_hasSpecial)   return 'Must contain at least 1 special character';
+              return null;
+            },
           ),
+          if (_password.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            _passwordChecklist(),
+          ],
           if (auth.errorMessage != null) ...[
             const SizedBox(height: 8),
             Text(auth.errorMessage!, style: const TextStyle(color: AppTheme.errorRed, fontSize: 13)),
@@ -181,6 +203,46 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _passwordChecklist() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FF),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _rule(_hasMinLen,    'More than 6 characters'),
+          _rule(_hasUppercase, '1 uppercase letter (A–Z)'),
+          _rule(_hasLowercase, '1 lowercase letter (a–z)'),
+          _rule(_hasDigit,     '1 number (0–9)'),
+          _rule(_hasSpecial,   '1 special character (!@#\$%...)'),
+        ],
+      ),
+    );
+  }
+
+  Widget _rule(bool passed, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(children: [
+        Icon(
+          passed ? Icons.check_circle : Icons.cancel,
+          size: 14,
+          color: passed ? AppTheme.successGreen : const Color(0xFFCBD5E1),
+        ),
+        const SizedBox(width: 6),
+        Text(label, style: TextStyle(
+          fontSize: 12,
+          color: passed ? AppTheme.successGreen : AppTheme.textGray,
+          fontWeight: passed ? FontWeight.w500 : FontWeight.normal,
+        )),
+      ]),
     );
   }
 
