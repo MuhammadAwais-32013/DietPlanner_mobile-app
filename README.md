@@ -74,18 +74,6 @@ A modern, full-stack web application that provides personalized diet plans and h
 - **Provider / Riverpod** - State management
 - **Dio** - HTTP client for API requests
 - **GoRouter** - Declarative routing
-=======
-### Frontend (43% Dart/JavaScript)
-- **Framework**: Next.js 13.4.19 (React framework with SSR)
-- **UI Framework**: React 18.2.0 with React Hooks
-- **State Management**: React Context API for global state
-- **Styling**: Tailwind CSS 3.3.3 (Utility-first CSS)
-- **PDF Generation**: jsPDF 2.5.1 (Client-side PDF export)
-- **HTTP Client**: Axios 1.9.0 (API communication)
-- **Date Picker**: react-datepicker 4.16.0 (Health tracking dates)
-- **Real-time**: WebSocket integration for live chat
-- **Build Tools**: PostCSS, Autoprefixer, ESLint
->>>>>>> 4634baa02a1089327db956ddc1e17e06fd914004
 
 ### Backend (56.6% Python)
 - **Framework**: FastAPI (Modern async Python web framework)
