@@ -36,11 +36,11 @@ A modern, full-stack web application that provides personalized diet plans and h
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Next.js** - React framework with server-side rendering
-- **React Hooks & Context API** - State management
-- **Tailwind CSS** - Utility-first CSS framework
-- **jsPDF** - Client-side PDF generation
-- **WebSocket** - Real-time chat communication
+- **Flutter** - Cross-platform UI framework
+- **Dart** - Primary programming language for the frontend
+- **Provider / Riverpod** - State management
+- **Dio** - HTTP client for API requests
+- **GoRouter** - Declarative routing
 
 ### Backend
 - **FastAPI** - Modern Python web framework
@@ -60,27 +60,27 @@ A modern, full-stack web application that provides personalized diet plans and h
 - **Knowledge Base**: Medical literature and guidelines
 - **Vector Search**: Semantic document retrieval
 - **Context-Aware Responses**: Grounded in scientific literature
-* To make To add more data 
-  uv run batch_ingest.py --pdf_dir data --output_dir faiss
-*
 
+*Note: To add more data:*
+```bash
+uv run batch_ingest.py --pdf_dir data --output_dir faiss
+```
 ## 📁 Project Structure
 
 ```
-S_FYP/
-├── 📁 Frontend (Next.js)
-│   ├── pages/                 # Next.js pages and routing
-│   ├── components/            # React components
-│   │   ├── Chatbot.js        # AI chatbot widget
-│   │   ├── Header.js         # Navigation header
-│   │   └── Layout.js         # Main layout wrapper
-│   ├── context/              # React context providers
-│   ├── utils/                # Utility functions
-│   └── styles/               # CSS and Tailwind config
+DietPlanner_mobile/
+├── 📁 diabp_mobile/          # Flutter Frontend application
+│   ├── android/              # Android-specific files
+│   ├── ios/                  # iOS-specific files
+│   ├── lib/                  # Dart UI code and logic
+│   │   ├── core/             # Themes, constants, networking
+│   │   ├── screens/          # Application screens
+│   │   ├── services/         # API integrations
+│   │   └── widgets/          # Reusable UI components
+│   └── pubspec.yaml          # Flutter dependencies
 │
-├── 📁 Backend (FastAPI)
+├── 📁 backend/               # FastAPI Backend
 │   ├── api/                  # API endpoints
-│   │   └── chatbot.py        # Chatbot API routes
 │   ├── ChatBot/              # RAG system core
 │   │   ├── data/             # Knowledge base and uploads
 │   │   ├── models/           # ML models
@@ -108,7 +108,7 @@ S_FYP/
 ### 1. Clone the Repository
 ```bash
 git clone <repository-url>
-cd S_FYP
+cd DietPlanner_mobile
 ```
 
 ### 2. Backend Setup
@@ -140,16 +140,21 @@ uv run uvicorn app:app --reload --host 0.0.0.0 --port 8000
 
 #### Install Dependencies
 ```bash
-npm install
+cd diabp_mobile
+flutter pub get
 ```
 
-#### Run Development Server
+#### Run the Application
 ```bash
-npm run dev
+# Run on Chrome
+flutter run -d chrome
+
+# Run on an Android emulator or connected device
+flutter run
 ```
 
 ### 4. Access the Application
-- **Frontend**: http://localhost:3000
+- **Frontend**: The app will launch in your browser (if using Chrome) or on your device/emulator.
 - **Backend API**: http://127.0.0.1:8000
 - **API Documentation**: http://127.0.0.1:8000/docs
 
@@ -204,10 +209,8 @@ MAX_UPLOAD_SIZE_MB=25
 ALLOWED_MIME_TYPES=application/pdf,image/jpeg,image/jpg,image/png
 ```
 
-#### Frontend (.env.local)
-```env
-NEXT_PUBLIC_BACKEND_BASE_URL=http://127.0.0.1:8000
-```
+#### Frontend (diabp_mobile/lib/core/constants.dart)
+Depending on how your app is structured, make sure the `AppConstants` or similar file points to the correct backend IP. E.g., `http://127.0.0.1:8000` or `http://<your-network-ip>:8000`.
 
 ### Database
 - **SQLite**: Default database (backend/instance/diet_consultant.db)
@@ -223,7 +226,8 @@ pytest tests/
 
 ### Frontend Tests
 ```bash
-npm test
+cd diabp_mobile
+flutter test
 ```
 
 ## 📚 API Documentation
@@ -258,8 +262,8 @@ npm test
 ### Production Setup
 1. **Environment**: Set production environment variables
 2. **Database**: Configure production database
-3. **Static Files**: Build and serve frontend
-4. **Process Management**: Use PM2 or similar
+3. **Frontend Build**: Use `flutter build web` or `flutter build apk`
+4. **Process Management**: Use PM2 or similar for the backend
 5. **Reverse Proxy**: Configure Nginx
 
 ### Docker Deployment
@@ -284,8 +288,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Google Gemini** for AI capabilities
 - **FastAPI** for the backend framework
-- **Next.js** for the frontend framework
-- **Tailwind CSS** for styling
+- **Flutter** for the cross-platform UI framework
 - **Medical research community** for diet and health guidelines
 
 ## 📞 Support
